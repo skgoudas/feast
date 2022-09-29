@@ -910,6 +910,7 @@ def athena_to_feast_value_type(athena_type_as_str: str) -> ValueType:
         "int": ValueType.INT32,
         "bigint": ValueType.INT64,
         "double": ValueType.DOUBLE,
+        "decimal": ValueType.DOUBLE,
         "float": ValueType.FLOAT,
         "binary": ValueType.BYTES,
         "char": ValueType.STRING,
@@ -917,7 +918,7 @@ def athena_to_feast_value_type(athena_type_as_str: str) -> ValueType:
         "string": ValueType.STRING,
         "timestamp": ValueType.UNIX_TIMESTAMP,
         "date": ValueType.UNIX_TIMESTAMP
-        # skip date,decimal,array,map,struct
+        # skip array,map,struct
     }
     return type_map[athena_type_as_str.split("(")[0].lower()]
 
