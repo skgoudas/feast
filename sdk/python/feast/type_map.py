@@ -916,9 +916,10 @@ def athena_to_feast_value_type(athena_type_as_str: str) -> ValueType:
         "varchar": ValueType.STRING,
         "string": ValueType.STRING,
         "timestamp": ValueType.UNIX_TIMESTAMP,
+        "date": ValueType.UNIX_TIMESTAMP
         # skip date,decimal,array,map,struct
     }
-    return type_map[athena_type_as_str.lower()]
+    return type_map[athena_type_as_str.split("(")[0].lower()]
 
 
 def pa_to_athena_value_type(pa_type: "pyarrow.DataType") -> str:
