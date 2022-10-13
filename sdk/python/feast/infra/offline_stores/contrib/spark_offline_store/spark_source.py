@@ -18,6 +18,9 @@ from feast.repo_config import RepoConfig
 from feast.saved_dataset import SavedDatasetStorage
 from feast.type_map import spark_to_feast_value_type
 from feast.value_type import ValueType
+from feast.infra.offline_stores.contrib.spark_offline_store.spark import (
+            get_spark_session_or_start_new_with_repoconfig,
+        )
 
 logger = logging.getLogger(__name__)
 
@@ -151,17 +154,14 @@ class SparkSource(DataSource):
     def get_table_column_names_and_types(
         self, config: RepoConfig
     ) -> Iterable[Tuple[str, str]]:
-        from feast.infra.offline_stores.contrib.spark_offline_store.spark import (
-            get_spark_session_or_start_new_with_repoconfig,
-        )
 
         spark_session = get_spark_session_or_start_new_with_repoconfig(
             store_config=config.offline_store
         )
-        df = spark_session.sql(f"SELECT * FROM {self.get_table_query_string()}")
+        df = spark_session.sql(f"SELECT * FROM {self.get_table_query_string(config)}")
         return ((field.name, field.dataType.simpleString()) for field in df.schema)
 
-    def get_table_query_string(self) -> str:
+    def get_table_query_string(self, config: RepoConfig) -> str:
         """Returns a string that can directly be used to reference this table in SQL"""
         if self.table:
             # Backticks make sure that spark sql knows this a table reference.
@@ -171,7 +171,9 @@ class SparkSource(DataSource):
             return f"({self.query})"
 
         # If both the table query string and the actual query are null, we can load from file.
-        spark_session = SparkSession.getActiveSession()
+        spark_session = get_spark_session_or_start_new_with_repoconfig(
+            store_config=config.offline_store
+        )
         if spark_session is None:
             raise AssertionError("Could not find an active spark session.")
         try:
