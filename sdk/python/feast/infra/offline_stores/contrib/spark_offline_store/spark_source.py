@@ -162,7 +162,7 @@ class SparkSource(DataSource):
         df = spark_session.sql(f"SELECT * FROM {self.get_table_query_string(config)}")
         return ((field.name, field.dataType.simpleString()) for field in df.schema)
 
-    def get_table_query_string(self, config: RepoConfig) -> str:
+    def get_table_query_string(self, config: RepoConfig=None) -> str:
         """Returns a string that can directly be used to reference this table in SQL"""
         from feast.infra.offline_stores.contrib.spark_offline_store.spark import (
             get_spark_session_or_start_new_with_repoconfig,
