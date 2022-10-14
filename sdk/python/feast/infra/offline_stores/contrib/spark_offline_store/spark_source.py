@@ -157,12 +157,12 @@ class SparkSource(DataSource):
         )
 
         spark_session = get_spark_session_or_start_new_with_repoconfig(
-            store_config=config.offline_store
+            store_config = config.offline_store
         )
         df = spark_session.sql(f"SELECT * FROM {self.get_table_query_string(config)}")
         return ((field.name, field.dataType.simpleString()) for field in df.schema)
 
-    def get_table_query_string(self, config: RepoConfig=None) -> str:
+    def get_table_query_string(self, config: Optional[RepoConfig] = None) -> str:
         """Returns a string that can directly be used to reference this table in SQL"""
         from feast.infra.offline_stores.contrib.spark_offline_store.spark import (
             get_spark_session_or_start_new_with_repoconfig,
@@ -176,9 +176,13 @@ class SparkSource(DataSource):
             return f"({self.query})"
 
         # If both the table query string and the actual query are null, we can load from file.
-        spark_session = get_spark_session_or_start_new_with_repoconfig(
-            store_config=config.offline_store
-        )
+        if config:
+            spark_session = get_spark_session_or_start_new_with_repoconfig(
+                store_config = config.offline_store
+            )
+        else:
+            spark_session = SparkSession.getActiveSession()
+
         if spark_session is None:
             raise AssertionError("Could not find an active spark session.")
         try:
