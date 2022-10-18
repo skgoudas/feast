@@ -179,6 +179,7 @@ class SparkOfflineStore(OfflineStore):
             registry,
             project,
             entity_df_event_timestamp_range,
+            config
         )
 
         query = offline_utils.build_point_in_time_query(

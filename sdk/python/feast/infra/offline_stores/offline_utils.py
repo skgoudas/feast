@@ -104,6 +104,7 @@ def get_feature_view_query_context(
     registry: BaseRegistry,
     project: str,
     entity_df_timestamp_range: Tuple[datetime, datetime],
+    config : Optional[RepoConfig] = None,
 ) -> List[FeatureViewQueryContext]:
     """
     Build a query context containing all information required to template a BigQuery and
@@ -166,7 +167,7 @@ def get_feature_view_query_context(
             timestamp_field=timestamp_field,
             created_timestamp_column=created_timestamp_column,
             # TODO: Make created column optional and not hardcoded
-            table_subquery=feature_view.batch_source.get_table_query_string(),
+            table_subquery=feature_view.batch_source.get_table_query_string(config),
             entity_selections=entity_selections,
             min_event_timestamp=min_event_timestamp,
             max_event_timestamp=max_event_timestamp,
