@@ -183,6 +183,7 @@ class SparkSource(DataSource):
         else:
             spark_session = SparkSession.getActiveSession()
 
+        logger.info(f"spark_session: {spark_session}")
         if spark_session is None:
             raise AssertionError("Could not find an active spark session.")
         try:
